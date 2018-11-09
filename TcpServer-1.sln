@@ -3,24 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TcpServer-1", "TcpServer-1\TcpServer-1.vcxproj", "{6A16D082-5698-4352-9A0F-50DA10ADDA87}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPSERVER", "TCPSERVER\TCPSERVER.csproj", "{B16C78DE-8661-43A4-B1A6-DB701F937A4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6A16D082-5698-4352-9A0F-50DA10ADDA87}.Debug|x64.ActiveCfg = Debug|x64
-		{6A16D082-5698-4352-9A0F-50DA10ADDA87}.Debug|x64.Build.0 = Debug|x64
-		{6A16D082-5698-4352-9A0F-50DA10ADDA87}.Debug|x86.ActiveCfg = Debug|Win32
-		{6A16D082-5698-4352-9A0F-50DA10ADDA87}.Debug|x86.Build.0 = Debug|Win32
-		{6A16D082-5698-4352-9A0F-50DA10ADDA87}.Release|x64.ActiveCfg = Release|x64
-		{6A16D082-5698-4352-9A0F-50DA10ADDA87}.Release|x64.Build.0 = Release|x64
-		{6A16D082-5698-4352-9A0F-50DA10ADDA87}.Release|x86.ActiveCfg = Release|Win32
-		{6A16D082-5698-4352-9A0F-50DA10ADDA87}.Release|x86.Build.0 = Release|Win32
+		{B16C78DE-8661-43A4-B1A6-DB701F937A4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B16C78DE-8661-43A4-B1A6-DB701F937A4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B16C78DE-8661-43A4-B1A6-DB701F937A4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B16C78DE-8661-43A4-B1A6-DB701F937A4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
