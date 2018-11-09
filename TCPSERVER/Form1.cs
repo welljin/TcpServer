@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TCPSERVER;
+using System.Net;
 
 namespace TCPSERVER
 {
@@ -15,6 +17,8 @@ namespace TCPSERVER
         public Form1()
         {
             InitializeComponent();
+            AsyncSocketServer server = new AsyncSocketServer(IPAddress.Parse("127.0.0.1"),502,10);
+            server.ServerStart();
         }
     }
 }
