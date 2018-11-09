@@ -56,6 +56,12 @@ namespace TCPSERVER
         #endregion
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="localIPAddress">服务器地址</param>
+        /// <param name="listenPort">服务器端口</param>
+        /// <param name="maxClient">连接限制</param>
         public AsyncSocketServer(IPAddress localIPAddress, int listenPort, int maxClient)
         {
             this.ServerAddress = localIPAddress;
