@@ -72,7 +72,7 @@ namespace TCPSERVER
             this._maxClientCount = maxClient;
 
             _clientsList = new List<Socket>();
-            _serverSocket = new Socket(localIPAddress.AddressFamily,SocketType.Stream, ProtocolType.Tcp);
+            _serverSocket = new Socket(localIPAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         }
 
         /// <summary>
@@ -130,11 +130,15 @@ namespace TCPSERVER
             {
                 _serverSocket.Close();
                 IsRunning = false;
-                foreach (Socket s in _clientsList)
+                lock (_clientsList)
                 {
-                    s.Shutdown(SocketShutdown.Both);
-                    s.Close();
+                    foreach (Socket s in _clientsList)
+                    {
+                        s.Shutdown(SocketShutdown.Both);
+                        s.Close();
+                    }
                 }
+
             }
         }
 
@@ -189,25 +193,25 @@ namespace TCPSERVER
             if (IsRunning)
             {
                 Socket _ClientSocket = ar.AsyncState as Socket;
-                
+
                 try
                 {
-                   int receivecount = _ClientSocket.EndReceive(ar);
-                   if (receivecount != 0)
-                   {
-                       _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceive), _ClientSocket);
-                       byte[] Receivebuff = new byte[receivecount];
-                       Array.Copy(Receivebuffer, Receivebuff, receivecount);
-                       Console.WriteLine($"收到数据：{ Encoding.ASCII.GetString(Receivebuff)}");
-                       
-                       if (Receivebuffer[0] == 53) HandleSend(_ClientSocket, new byte[] { 0, 1, 2, 3, 4, 5 });
-                   }
-                   else//正常断开
-                   {
+                    int receivecount = _ClientSocket.EndReceive(ar);
+                    if (receivecount != 0)
+                    {
+                        _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceive), _ClientSocket);
+                        byte[] Receivebuff = new byte[receivecount];
+                        Array.Copy(Receivebuffer, Receivebuff, receivecount);
+                        Console.WriteLine($"收到数据：{ Encoding.ASCII.GetString(Receivebuff)}");
+
+                        if (Receivebuffer[0] == 53) HandleSend(_ClientSocket, new byte[] { 0, 1, 2, 3, 4, 5 });
+                    }
+                    else//正常断开
+                    {
                         _currentClientCount--;
                         _clientsList.Remove(_ClientSocket);
                         Console.WriteLine($"断开连接：{ _ClientSocket.RemoteEndPoint.ToString()}");
-                   }
+                    }
                 }
                 catch //(Exception ex)//异常断开
                 {
@@ -226,10 +230,10 @@ namespace TCPSERVER
         /// <param name="data"></param>
         public void HandleSend(Socket client, byte[] data)
         {
-            if (!IsRunning)  throw new InvalidProgramException("This TCP Scoket server has not been started.");
+            if (!IsRunning) throw new InvalidProgramException("This TCP Scoket server has not been started.");
             if (client == null) throw new ArgumentNullException("client");
-            if (data == null)  throw new ArgumentNullException("data");
-            client.BeginSend(data, 0, data.Length, SocketFlags.None,null, null);
+            if (data == null) throw new ArgumentNullException("data");
+            client.BeginSend(data, 0, data.Length, SocketFlags.None, null, null);
         }
 
         #endregion
@@ -276,4 +280,60 @@ namespace TCPSERVER
         }
         #endregion
     }
+
+    //\\\\\\\\\\\\\\\\\\\\\\\\\\定义服务器打开事件//////////////////////////\\
+    public class TcpServerStartEventArgs : EventArgs
+    {
+        public Socket Socket { get; set; }
+
+        public TcpServerStartEventArgs(Socket _Socket)
+        {
+            Socket = _Socket;
+        }
+    }
+
+    //\\\\\\\\\\\\\\\\\\\\\\\\\\定义服务器关闭事件//////////////////////////\\
+    public class TcpServerStopEventArgs : EventArgs
+    {
+        public Socket Socket { get; set; }
+
+        public TcpServerStopEventArgs(Socket _Socket)
+        {
+            Socket = _Socket;
+        }
+    }
+
+    //\\\\\\\\\\\\\\\\\\\\\\\定义服务器接收客户端事件///////////////////////\\
+    public class TcpServerClientConnectedEventArgs : EventArgs
+    {
+        public Socket Socket { get; set; }
+
+        public TcpServerClientConnectedEventArgs(Socket _Socket)
+        {
+            Socket = _Socket;
+        }
+    }
+
+    //\\\\\\\\\\\\\\\\\\\\\\\\定义服务器接收数据事件////////////////////////\\
+    public class TcpServerReceiveDatadEventArgs : EventArgs
+    {
+        public Socket Socket { set; get; }
+
+        public TcpServerReceiveDatadEventArgs(Socket _Socket)
+        {
+            Socket = _Socket;
+        }
+    }
+
+    //\\\\\\\\\\\\\\\\\\\\\\\定义服务器客户端断开事件///////////////////////\\
+    public class TcpServerClientDisconnectedEventArgs : EventArgs
+    {
+        public Socket Socket { get; set; }
+
+        public TcpServerClientDisconnectedEventArgs(Socket _Socket)
+        {
+            Socket = _Socket;
+        }
+    }
+
 }
