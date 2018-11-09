@@ -17,18 +17,33 @@ namespace TCPSERVER
         private AsyncSocketServer server;
         public Form1()
         {
-            InitializeComponent();  
+            InitializeComponent();
+            GetLocalIPaddress();
+        }
+
+        private void GetLocalIPaddress()
+        {
+            IPAddress[] iplist = Dns.GetHostAddresses(Dns.GetHostName());
+            this.IPcomboBox.Items.Clear();
+            foreach (IPAddress ip in iplist)
+            {
+                this.IPcomboBox.Items.Add(ip.ToString());
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             server.Dispose();
+            button2.Enabled =true;
+            button1.Enabled = false;
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            server = new AsyncSocketServer(IPAddress.Parse("127.0.0.1"), 502, 10);
+            server = new AsyncSocketServer(IPAddress.Parse(IPcomboBox.Text),int.Parse(PorttextBox.Text), 10);
             server.ServerStart();
+            button2.Enabled = !server.IsRunning;
+            button1.Enabled = server.IsRunning;
         }
     }
 }

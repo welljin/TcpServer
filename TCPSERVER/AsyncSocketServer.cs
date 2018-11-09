@@ -27,11 +27,6 @@ namespace TCPSERVER
         /// </summary>
         private Socket _serverSocket;
 
-        /// <summary>
-        /// session list
-        /// </summary>
-        private List<Socket> _clientsList;
-
         private byte[] Receivebuffer;
 
         private bool disposed = false;
@@ -49,6 +44,11 @@ namespace TCPSERVER
         /// server ip address
         /// </summary>
         public IPAddress ServerAddress { get; private set; }
+
+        /// <summary>
+        /// clients list
+        /// </summary>
+        public List<Socket> _clientsList { get; private set; }
 
         /// <summary>
         /// server port
@@ -138,6 +138,17 @@ namespace TCPSERVER
             }
         }
 
+        #endregion.
+
+        #region 获取本机地址列表
+
+        /// <summary>
+        /// 获取本机IPadress列表
+        /// </summary>
+        private IPAddress[] GetLocalIPaddress()
+        {
+            return Dns.GetHostAddresses(Dns.GetHostName());
+        }
         #endregion
 
         #region 接收连接+接收数据+发送数据
