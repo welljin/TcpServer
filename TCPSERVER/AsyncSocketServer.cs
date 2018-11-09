@@ -90,7 +90,7 @@ namespace TCPSERVER
 
         #endregion
 
-        #region 实现方法
+        #region 打开关闭服务
 
         /// <summary>
         /// 启动服务器，默认最大连接数位10
@@ -126,87 +126,102 @@ namespace TCPSERVER
         /// </summary>
         public void ServerStop()
         {
-            if(IsRunning)
+            if (IsRunning)
             {
                 _serverSocket.Close();
                 IsRunning = false;
+                foreach (Socket s in _clientsList)
+                {
+                    s.Shutdown(SocketShutdown.Both);
+                    s.Close();
+                }
             }
         }
 
+        #endregion
+
+        #region 接收连接+接收数据+发送数据
+
+        /// <summary>
+        /// 接受客户端连接
+        /// </summary>
+        /// <param name="ar">异步结果</param>
         public void HandleAcceptClient(IAsyncResult ar)
         {
-           if(IsRunning)
-           {              
-                Socket _ServerSocket =(Socket)ar.AsyncState;  //服务端            
+            if (IsRunning)
+            {
+                Socket _ServerSocket = (Socket)ar.AsyncState;  //服务端            
                 Socket _ClientSocket = _ServerSocket.EndAccept(ar);//客户端
-
-                if(_currentClientCount>=_maxClientCount)
+                if (_currentClientCount >= _maxClientCount)
                 {
                     throw new Exception("连接数超过限制");
                 }
                 else
                 {
-                    _currentClientCount++; //客户端已连接     
-                    _clientsList.Add(_ClientSocket);//加入列表
+                    _currentClientCount++;
+                    _clientsList.Add(_ClientSocket);
                     Console.WriteLine($"收到连接：{ _ClientSocket.RemoteEndPoint.ToString()}");
 
                     Receivebuffer = new byte[1024];
-                    _ClientSocket.BeginReceive(Receivebuffer,0, Receivebuffer.Length,SocketFlags.None,new AsyncCallback(HandleDataReceive), _ClientSocket);
+                    _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceive), _ClientSocket);
                 }
                 _ServerSocket.BeginAccept(new AsyncCallback(HandleAcceptClient), _ServerSocket);
-           }
+            }
         }
 
+        /// <summary>
+        /// 接收数据
+        /// </summary>
+        /// <param name="ar"></param>
         private void HandleDataReceive(IAsyncResult ar)
         {
             if (IsRunning)
             {
                 Socket _ClientSocket = ar.AsyncState as Socket;
-                int receivecount = _ClientSocket.EndReceive(ar);
+                
                 try
                 {
-                    if (receivecount == 0)
-                    {
+                   int receivecount = _ClientSocket.EndReceive(ar);
+                   if (receivecount != 0)
+                   {
+                       _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceive), _ClientSocket);
+                       byte[] Receivebuff = new byte[receivecount];
+                       Array.Copy(Receivebuffer, Receivebuff, receivecount);
+                       Console.WriteLine($"收到数据：{ Encoding.ASCII.GetString(Receivebuff)}");
+                       
+                       if (Receivebuffer[0] == 53) HandleSend(_ClientSocket, new byte[] { 0, 1, 2, 3, 4, 5 });
+                   }
+                   else//正常断开
+                   {
                         _currentClientCount--;
                         _clientsList.Remove(_ClientSocket);
-                        _ClientSocket.Shutdown(SocketShutdown.Both);//关闭数据的接受和发送 
-                        _ClientSocket.Close();//清理资源
+                        Console.WriteLine($"断开连接：{ _ClientSocket.RemoteEndPoint.ToString()}");
+                   }
+                }
+                catch //(Exception ex)//异常断开
+                {
+                    _currentClientCount--;
+                    _clientsList.Remove(_ClientSocket);
+                    Console.WriteLine($"断开连接：{ _ClientSocket.RemoteEndPoint.ToString()}");
+                }
 
-                        //断开连接
-                        //TO-DO
-                        return;
-                    }
-                    Console.WriteLine($"收到数据：{ Encoding.ASCII.GetString(Receivebuffer)}");
-                    if(Receivebuffer[0]==53)
-                    {
-                        Send(_ClientSocket,new byte[] {0,1,2,3,4,5 });
-                    }
-                }
-                catch(Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-                finally
-                {
-                    _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceive), _ClientSocket);
-                }
             }
         }
 
-        public void Send(Socket client, byte[] data)
+        /// <summary>
+        /// 发送数据
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="data"></param>
+        public void HandleSend(Socket client, byte[] data)
         {
-            if (!IsRunning)
-                throw new InvalidProgramException("This TCP Scoket server has not been started.");
-
-            if (client == null)
-                throw new ArgumentNullException("client");
-
-            if (data == null)
-                throw new ArgumentNullException("data");
+            if (!IsRunning)  throw new InvalidProgramException("This TCP Scoket server has not been started.");
+            if (client == null) throw new ArgumentNullException("client");
+            if (data == null)  throw new ArgumentNullException("data");
             client.BeginSend(data, 0, data.Length, SocketFlags.None,null, null);
         }
-        #endregion
 
+        #endregion
 
         #region Dispose
         /// <summary>
@@ -231,19 +246,19 @@ namespace TCPSERVER
             {
                 if (disposing)
                 {
-                    //try
-                    //{
-                    //    Stop();
-                    //    if (_serverSock != null)
-                    //    {
-                    //        _serverSock = null;
-                    //    }
-                    //}
-                    //catch (SocketException)
-                    //{
-                    //    //TODO
-                    //    RaiseOtherException(null);
-                    //}
+                    try
+                    {
+                        ServerStop();
+                        if (_serverSocket != null)
+                        {
+                            _serverSocket = null;
+                        }
+                    }
+                    catch (SocketException)
+                    {
+                        //TODO
+                        //RaiseOtherException(null);
+                    }
                 }
                 disposed = true;
             }

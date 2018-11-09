@@ -14,10 +14,20 @@ namespace TCPSERVER
 {
     public partial class Form1 : Form
     {
+        private AsyncSocketServer server;
         public Form1()
         {
-            InitializeComponent();
-            AsyncSocketServer server = new AsyncSocketServer(IPAddress.Parse("127.0.0.1"),502,10);
+            InitializeComponent();  
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            server.Dispose();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            server = new AsyncSocketServer(IPAddress.Parse("127.0.0.1"), 502, 10);
             server.ServerStart();
         }
     }
