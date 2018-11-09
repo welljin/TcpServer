@@ -149,11 +149,8 @@ namespace TCPSERVER
                     _currentClientCount++; //客户端已连接     
                     _clientsList.Add(_ClientSocket);//加入列表
                     Console.WriteLine($"收到连接：{ _ClientSocket.RemoteEndPoint.ToString()}");
-                    //lock(this)
-                    //{
-                    //    _clientsList.Add(_ClientSocket);
-                    //}
-                    Receivebuffer = new byte[_ClientSocket.ReceiveBufferSize];
+
+                    Receivebuffer = new byte[1024];
                     _ClientSocket.BeginReceive(Receivebuffer,0, Receivebuffer.Length,SocketFlags.None,new AsyncCallback(HandleDataReceive), _ClientSocket);
                 }
                 _ServerSocket.BeginAccept(new AsyncCallback(HandleAcceptClient), _ServerSocket);
@@ -164,7 +161,7 @@ namespace TCPSERVER
         {
             if (IsRunning)
             {
-                Socket _ClientSocket = (Socket)ar.AsyncState;
+                Socket _ClientSocket = ar.AsyncState as Socket;
                 int receivecount = _ClientSocket.EndReceive(ar);
                 try
                 {
@@ -207,7 +204,6 @@ namespace TCPSERVER
             if (data == null)
                 throw new ArgumentNullException("data");
             client.BeginSend(data, 0, data.Length, SocketFlags.None,null, null);
-            client.BeginSend();
         }
         #endregion
 
