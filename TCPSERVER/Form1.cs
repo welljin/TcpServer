@@ -101,8 +101,7 @@ namespace TCPSERVER
 
         private void ReceiveData(object sender, TcpServerReceiveDatadEventArgs e)
         {
-            Invoke(new Action(() => { LogtextBox.Text = LogtextBox.Text + $"\r\n{ DateTime.Now.ToString() + "收到:" + Encoding.ASCII.GetString(e.Data)}"; }));
-
+            Invoke(new Action(() => { ReceivetextBox.Text = ReceivetextBox.Text + $"\r\n{ e.Socket.RemoteEndPoint.ToString() + "->收到:" + Encoding.ASCII.GetString(e.Data)}"; }));
         }
     }
 }
