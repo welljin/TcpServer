@@ -140,6 +140,7 @@
             this.ReceivetextBox.Location = new System.Drawing.Point(130, 199);
             this.ReceivetextBox.Multiline = true;
             this.ReceivetextBox.Name = "ReceivetextBox";
+            this.ReceivetextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.ReceivetextBox.Size = new System.Drawing.Size(298, 134);
             this.ReceivetextBox.TabIndex = 10;
             // 
