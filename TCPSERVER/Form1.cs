@@ -136,5 +136,10 @@ namespace TCPSERVER
                 MessageBox.Show("无客户端连接！");
             }
         }
+
+        //public override void HandleSendDataCallback(IAsyncResult ar)
+        //{
+
+        //}
     }
 }

@@ -255,7 +255,7 @@ namespace TcpServer.AsyncSocketServer
         /// 发送数据
         /// </summary>
         /// <param name="ar"></param>
-        private void HandleSendDataCallback(IAsyncResult ar)
+        public virtual void HandleSendDataCallback(IAsyncResult ar)
         {
             Socket server = ar.AsyncState as Socket;
             int bytesend = server.EndSend(ar);
@@ -264,7 +264,6 @@ namespace TcpServer.AsyncSocketServer
                 //to-do 发送完成工作
             }
         }
-
         #endregion
 
         #region Dispose
