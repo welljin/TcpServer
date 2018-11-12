@@ -16,6 +16,7 @@ namespace TcpServer.AsyncSocketServer
         public event EventHandler<TcpServerStopEventArgs> _ServerStop;
         public event EventHandler<TcpServerClientConnectedEventArgs> _ClientConnected;
         public event EventHandler<TcpServerReceiveDatadEventArgs> _ReceiveData;
+        public event EventHandler<TcpServerSendDatadEventArgs> _SendData;
         public event EventHandler<TcpServerClientDisconnectedEventArgs> _ClientDisconnected;
         #endregion
 
@@ -110,7 +111,7 @@ namespace TcpServer.AsyncSocketServer
             {
                 _serverSocket.Bind(new IPEndPoint(this.ServerAddress, this.ServerPort));
                 _serverSocket.Listen(10);
-                _serverSocket.BeginAccept(new AsyncCallback(HandleAcceptClient), _serverSocket);
+                _serverSocket.BeginAccept(new AsyncCallback(HandleAcceptClientCallback), _serverSocket);
                 IsRunning = true;
                 _ServerStart?.Invoke(this,new TcpServerStartEventArgs(_serverSocket));
                 Trace.Write($"{DateTime.Now.ToString()}:服务器{ServerAddress.ToString()}已启动");
@@ -126,7 +127,7 @@ namespace TcpServer.AsyncSocketServer
             {
                 _serverSocket.Bind(new IPEndPoint(this.ServerAddress, this.ServerPort));
                 _serverSocket.Listen(backlog);
-                _serverSocket.BeginAccept(new AsyncCallback(HandleAcceptClient), _serverSocket);
+                _serverSocket.BeginAccept(new AsyncCallback(HandleAcceptClientCallback), _serverSocket);
                 IsRunning = true;
                 _ServerStart?.Invoke(this, new TcpServerStartEventArgs(_serverSocket));
                 Trace.Write($"{DateTime.Now.ToString()}:服务器{ServerAddress.ToString()}已启动");
@@ -174,7 +175,7 @@ namespace TcpServer.AsyncSocketServer
         /// 接受客户端连接
         /// </summary>
         /// <param name="ar">异步结果</param>
-        public void HandleAcceptClient(IAsyncResult ar)
+        public void HandleAcceptClientCallback(IAsyncResult ar)
         {
             if (IsRunning)
             {
@@ -191,9 +192,9 @@ namespace TcpServer.AsyncSocketServer
                     _ClientConnected?.Invoke(this,new TcpServerClientConnectedEventArgs(_ClientSocket));
                     Trace.Write($"{DateTime.Now.ToString()}:客户端{_ClientSocket.RemoteEndPoint.ToString()}已启动");
                     Receivebuffer = new byte[1024];
-                    _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceive), _ClientSocket);
+                    _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceiveCallback), _ClientSocket);
                 }
-                _ServerSocket.BeginAccept(new AsyncCallback(HandleAcceptClient), _ServerSocket);
+                _ServerSocket.BeginAccept(new AsyncCallback(HandleAcceptClientCallback), _ServerSocket);
             }
         }
 
@@ -201,7 +202,7 @@ namespace TcpServer.AsyncSocketServer
         /// 接收数据
         /// </summary>
         /// <param name="ar"></param>
-        private void HandleDataReceive(IAsyncResult ar)
+        private void HandleDataReceiveCallback(IAsyncResult ar)
         {
             if (IsRunning)
             {
@@ -212,7 +213,7 @@ namespace TcpServer.AsyncSocketServer
                     int receivecount = _ClientSocket.EndReceive(ar);
                     if (receivecount != 0)
                     {
-                        _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceive), _ClientSocket);
+                        _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceiveCallback), _ClientSocket);
                         byte[] Receivebuff = new byte[receivecount];
                         Array.Copy(Receivebuffer, Receivebuff, receivecount);
                         _ReceiveData?.Invoke(this, new TcpServerReceiveDatadEventArgs(_ClientSocket, Receivebuff));
@@ -238,14 +239,30 @@ namespace TcpServer.AsyncSocketServer
         /// <summary>
         /// 发送数据
         /// </summary>
-        /// <param name="client"></param>
+        /// <param name="server"></param>
         /// <param name="data"></param>
-        public void HandleSend(Socket client, byte[] data)
+        public void HandleSendData(Socket server, byte[] data)
         {
             if (!IsRunning) throw new InvalidProgramException("服务端尚未启动！");
-            if (client == null) throw new ArgumentNullException("客户端client为空！");
-            if (data == null) throw new ArgumentNullException("客户端数据data为空！");
-            client.BeginSend(data, 0, data.Length, SocketFlags.None, null, null);
+            if (server == null) throw new ArgumentNullException("服务端地址为空！");
+            if (data == null) throw new ArgumentNullException("服务端数据data为空！");
+            //client.BeginSend(data, 0, data.Length, SocketFlags.None, null, null);
+            server.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(HandleSendDataCallback), server);
+            _SendData?.Invoke(this, new TcpServerSendDatadEventArgs(server, data));
+        }
+
+        /// <summary>
+        /// 发送数据
+        /// </summary>
+        /// <param name="ar"></param>
+        private void HandleSendDataCallback(IAsyncResult ar)
+        {
+            Socket server = ar.AsyncState as Socket;
+            int bytesend = server.EndSend(ar);
+            if (bytesend == 0)
+            {
+                //to-do 发送完成工作
+            }
         }
 
         #endregion
@@ -353,6 +370,25 @@ namespace TcpServer.AsyncSocketServer
             Data = _Data;
         }
     }
+
+    //\\\\\\\\\\\\\\\\\\\\\\\\定义服务器发送数据事件////////////////////////\\
+    /// <summary>
+    /// 服务器发送数据事件
+    /// Socket：当前会话客户端Socket
+    /// Data：客户端发送数据
+    /// </summary>
+    public class TcpServerSendDatadEventArgs : EventArgs
+    {
+        public Socket Socket { set; get; }
+        public byte[] Data { set; get; }
+
+        public TcpServerSendDatadEventArgs(Socket _Socket, byte[] _Data)
+        {
+            Socket = _Socket;
+            Data = _Data;
+        }
+    }
+
 
     //\\\\\\\\\\\\\\\\\\\\\\\定义服务器客户端断开事件///////////////////////\\
     /// <summary>

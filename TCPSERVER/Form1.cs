@@ -40,6 +40,7 @@ namespace TCPSERVER
             server._ClientConnected -= ClientConnected;
             server._ClientDisconnected -= ClientDisconnected;
             server._ReceiveData -= ReceiveData;
+            server._SendData -= SendData;
             server?.Dispose();
 
             button2.Enabled = true;
@@ -55,10 +56,12 @@ namespace TCPSERVER
                 server._ClientConnected += ClientConnected;
                 server._ClientDisconnected += ClientDisconnected;
                 server._ReceiveData += ReceiveData;
+                server._SendData += SendData;
                 server.ServerStart();
 
                 button2.Enabled = !server.IsRunning;
                 button1.Enabled = server.IsRunning;
+
             }
             catch
             {
@@ -102,6 +105,17 @@ namespace TCPSERVER
         private void ReceiveData(object sender, TcpServerReceiveDatadEventArgs e)
         {
             Invoke(new Action(() => { ReceivetextBox.Text = ReceivetextBox.Text + $"{ e.Socket.RemoteEndPoint.ToString() + "->收到:" + Encoding.ASCII.GetString(e.Data)}\r\n"; }));
+        }
+
+        private void SendData(object sender,TcpServerSendDatadEventArgs e)
+        {
+            Invoke(new Action(() => { LogtextBox.Text = LogtextBox.Text + $"{ e.Socket.LocalEndPoint.ToString() + "->发送:" + Encoding.ASCII.GetString(e.Data)}\r\n"; }));
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            server.HandleSendData(server._clientsList[ClientslistBox.SelectedIndex], Encoding.ASCII.GetBytes(this.SendtextBox.Text));
         }
     }
 }
