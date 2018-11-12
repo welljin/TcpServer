@@ -221,7 +221,7 @@ namespace TcpServer.AsyncSocketServer
                     {
                         _currentClientCount--;
                         _clientsList.Remove(_ClientSocket);
-                        _ClientDisconnected?.Invoke(this,new TcpServerClientDisconnectedEventArgs(_ClientSocket));
+                        _ClientDisconnected?.Invoke(this, new TcpServerClientDisconnectedEventArgs(_ClientSocket));
                         Console.WriteLine($"断开连接：{ _ClientSocket.RemoteEndPoint.ToString()}");
                     }
                 }
@@ -232,7 +232,6 @@ namespace TcpServer.AsyncSocketServer
                     _ClientDisconnected?.Invoke(this, new TcpServerClientDisconnectedEventArgs(_ClientSocket));
                     Console.WriteLine($"断开连接：{ _ClientSocket.RemoteEndPoint.ToString()}");
                 }
-
             }
         }
 
