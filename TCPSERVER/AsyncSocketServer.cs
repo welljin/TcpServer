@@ -7,12 +7,11 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TCPSERVER
+namespace TcpServer.AsyncSocketServer
 {
     public class AsyncSocketServer : IDisposable
     {
         #region 服务器事件
-
         public event EventHandler<TcpServerStartEventArgs> _ServerStart;
         public event EventHandler<TcpServerStopEventArgs> _ServerStop;
         public event EventHandler<TcpServerClientConnectedEventArgs> _ClientConnected;
@@ -113,7 +112,7 @@ namespace TCPSERVER
                 _serverSocket.Listen(10);
                 _serverSocket.BeginAccept(new AsyncCallback(HandleAcceptClient), _serverSocket);
                 IsRunning = true;
-                _ServerStart.Invoke(this,new TcpServerStartEventArgs(_serverSocket));
+                _ServerStart?.Invoke(this,new TcpServerStartEventArgs(_serverSocket));
                 Trace.Write($"{DateTime.Now.ToString()}:服务器{ServerAddress.ToString()}已启动");
             }
         }
@@ -129,7 +128,7 @@ namespace TCPSERVER
                 _serverSocket.Listen(backlog);
                 _serverSocket.BeginAccept(new AsyncCallback(HandleAcceptClient), _serverSocket);
                 IsRunning = true;
-                _ServerStart.Invoke(this, new TcpServerStartEventArgs(_serverSocket));
+                _ServerStart?.Invoke(this, new TcpServerStartEventArgs(_serverSocket));
                 Trace.Write($"{DateTime.Now.ToString()}:服务器{ServerAddress.ToString()}已启动");
             }
         }
@@ -151,7 +150,7 @@ namespace TCPSERVER
                         s.Close();
                     }
                 }
-                _ServerStop.Invoke(this, new TcpServerStopEventArgs(_serverSocket));
+                _ServerStop?.Invoke(this, new TcpServerStopEventArgs(_serverSocket));
                 Trace.Write($"{DateTime.Now.ToString()}:服务器{ServerAddress.ToString()}已关闭");
             }
         }
@@ -189,7 +188,7 @@ namespace TCPSERVER
                 {
                     _currentClientCount++;
                     _clientsList.Add(_ClientSocket);
-                    _ClientConnected.Invoke(this,new TcpServerClientConnectedEventArgs(_ClientSocket));
+                    _ClientConnected?.Invoke(this,new TcpServerClientConnectedEventArgs(_ClientSocket));
                     Trace.Write($"{DateTime.Now.ToString()}:客户端{_ClientSocket.RemoteEndPoint.ToString()}已启动");
                     Receivebuffer = new byte[1024];
                     _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceive), _ClientSocket);
@@ -216,12 +215,13 @@ namespace TCPSERVER
                         _ClientSocket.BeginReceive(Receivebuffer, 0, Receivebuffer.Length, SocketFlags.None, new AsyncCallback(HandleDataReceive), _ClientSocket);
                         byte[] Receivebuff = new byte[receivecount];
                         Array.Copy(Receivebuffer, Receivebuff, receivecount);
-                        _ReceiveData.Invoke(this, new TcpServerReceiveDatadEventArgs(_ClientSocket, Receivebuff));
+                        _ReceiveData?.Invoke(this, new TcpServerReceiveDatadEventArgs(_ClientSocket, Receivebuff));
                     }
                     else//正常断开
                     {
                         _currentClientCount--;
                         _clientsList.Remove(_ClientSocket);
+                        _ClientDisconnected?.Invoke(this,new TcpServerClientDisconnectedEventArgs(_ClientSocket));
                         Console.WriteLine($"断开连接：{ _ClientSocket.RemoteEndPoint.ToString()}");
                     }
                 }
@@ -229,6 +229,7 @@ namespace TCPSERVER
                 {
                     _currentClientCount--;
                     _clientsList.Remove(_ClientSocket);
+                    _ClientDisconnected?.Invoke(this, new TcpServerClientDisconnectedEventArgs(_ClientSocket));
                     Console.WriteLine($"断开连接：{ _ClientSocket.RemoteEndPoint.ToString()}");
                 }
 
@@ -294,6 +295,10 @@ namespace TCPSERVER
     }
 
     //\\\\\\\\\\\\\\\\\\\\\\\\\\定义服务器打开事件//////////////////////////\\
+    /// <summary>
+    /// TcpServer启动事件；绑定后，可接收启动事件。
+    /// 参数：Socket（服务器Socket）
+    /// </summary>
     public class TcpServerStartEventArgs : EventArgs
     {
         public Socket Socket { get; set; }
@@ -305,6 +310,9 @@ namespace TCPSERVER
     }
 
     //\\\\\\\\\\\\\\\\\\\\\\\\\\定义服务器关闭事件//////////////////////////\\
+    /// <summary>
+    /// TcpServer停止事件，绑定后，可接收停止事件
+    /// </summary>
     public class TcpServerStopEventArgs : EventArgs
     {
         public Socket Socket { get; set; }
@@ -316,6 +324,9 @@ namespace TCPSERVER
     }
 
     //\\\\\\\\\\\\\\\\\\\\\\\定义服务器接收客户端事件///////////////////////\\
+    /// <summary>
+    /// TcpServer客户端连接事件，绑定后客户端连接可触发
+    /// </summary>
     public class TcpServerClientConnectedEventArgs : EventArgs
     {
         public Socket Socket { get; set; }
@@ -327,6 +338,11 @@ namespace TCPSERVER
     }
 
     //\\\\\\\\\\\\\\\\\\\\\\\\定义服务器接收数据事件////////////////////////\\
+    /// <summary>
+    /// 服务器接收数据事件
+    /// Socket：当前会话客户端Socket
+    /// Data：客户端发送数据
+    /// </summary>
     public class TcpServerReceiveDatadEventArgs : EventArgs
     {
         public Socket Socket { set; get; }
@@ -340,6 +356,9 @@ namespace TCPSERVER
     }
 
     //\\\\\\\\\\\\\\\\\\\\\\\定义服务器客户端断开事件///////////////////////\\
+    /// <summary>
+    /// 
+    /// </summary>
     public class TcpServerClientDisconnectedEventArgs : EventArgs
     {
         public Socket Socket { get; set; }

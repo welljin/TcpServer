@@ -157,7 +157,8 @@
             this.LogtextBox.Location = new System.Drawing.Point(4, 339);
             this.LogtextBox.Multiline = true;
             this.LogtextBox.Name = "LogtextBox";
-            this.LogtextBox.Size = new System.Drawing.Size(424, 119);
+            this.LogtextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.LogtextBox.Size = new System.Drawing.Size(424, 117);
             this.LogtextBox.TabIndex = 12;
             // 
             // label5
