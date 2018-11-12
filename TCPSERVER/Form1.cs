@@ -75,7 +75,7 @@ namespace TCPSERVER
                 ClientslistBox.Items.Clear();
                 foreach (Socket s in server._clientsList)
                 {
-                    ClientslistBox.Items.Add(s.LocalEndPoint.ToString());
+                    ClientslistBox.Items.Add(s.RemoteEndPoint.ToString());
                 }
                 LogtextBox.Text = LogtextBox.Text + $"\r\n{ DateTime.Now.ToString() + "Clients:" + e.Socket.RemoteEndPoint.ToString()}已连接";
             }));
@@ -93,7 +93,7 @@ namespace TCPSERVER
                 ClientslistBox.Items.Clear();
                 foreach (Socket s in server._clientsList)
                 {
-                    ClientslistBox.Items.Add(s.LocalEndPoint.ToString());
+                    ClientslistBox.Items.Add(s.RemoteEndPoint.ToString());
                 }
                 LogtextBox.Text = LogtextBox.Text + $"\r\n{ DateTime.Now.ToString() + "Clients:" + e.Socket.RemoteEndPoint.ToString()}已断开";
             }));
