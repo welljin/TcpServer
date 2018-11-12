@@ -45,6 +45,8 @@ namespace TCPSERVER
 
             button2.Enabled = true;
             button1.Enabled = false;
+            IPcomboBox.Enabled = true;
+            PorttextBox.Enabled = true;
         }
 
         private void Button2_Click(object sender, EventArgs e)
@@ -61,13 +63,16 @@ namespace TCPSERVER
 
                 button2.Enabled = !server.IsRunning;
                 button1.Enabled = server.IsRunning;
-
+                IPcomboBox.Enabled = !server.IsRunning;
+                PorttextBox.Enabled = !server.IsRunning;
             }
             catch
             {
                 server?.Dispose();
                 button2.Enabled = true;
                 button1.Enabled = false;
+                IPcomboBox.Enabled = true;
+                PorttextBox.Enabled = true;
             }
         }
 
@@ -107,7 +112,7 @@ namespace TCPSERVER
             Invoke(new Action(() => { ReceivetextBox.Text = ReceivetextBox.Text + $"{ e.Socket.RemoteEndPoint.ToString() + "->收到:" + Encoding.ASCII.GetString(e.Data)}\r\n"; }));
         }
 
-        private void SendData(object sender,TcpServerSendDatadEventArgs e)
+        private void SendData(object sender, TcpServerSendDatadEventArgs e)
         {
             Invoke(new Action(() => { LogtextBox.Text = LogtextBox.Text + $"{ e.Socket.LocalEndPoint.ToString() + "->发送:" + Encoding.ASCII.GetString(e.Data)}\r\n"; }));
 
@@ -115,7 +120,21 @@ namespace TCPSERVER
 
         private void button3_Click(object sender, EventArgs e)
         {
-            server.HandleSendData(server._clientsList[ClientslistBox.SelectedIndex], Encoding.ASCII.GetBytes(this.SendtextBox.Text));
+            if (server._clientsList.Count > 0)
+            {
+                if (ClientslistBox.SelectedIndex != -1)
+                {
+                    server.HandleSendData(server._clientsList[ClientslistBox.SelectedIndex], Encoding.ASCII.GetBytes(this.SendtextBox.Text));
+                }
+                else
+                {
+                    MessageBox.Show("请选择客户端！");
+                }
+            }
+            else
+            {
+                MessageBox.Show("无客户端连接！");
+            }
         }
     }
 }

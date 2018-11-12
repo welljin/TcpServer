@@ -244,8 +244,8 @@ namespace TcpServer.AsyncSocketServer
         public void HandleSendData(Socket server, byte[] data)
         {
             if (!IsRunning) throw new InvalidProgramException("服务端尚未启动！");
-            if (server == null) throw new ArgumentNullException("服务端地址为空！");
-            if (data == null) throw new ArgumentNullException("服务端数据data为空！");
+            if (server == null) throw new ArgumentNullException("接收端Client地址为空！");
+            if (data == null) throw new ArgumentNullException("发送数据data为空！");
             //client.BeginSend(data, 0, data.Length, SocketFlags.None, null, null);
             server.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(HandleSendDataCallback), server);
             _SendData?.Invoke(this, new TcpServerSendDatadEventArgs(server, data));
