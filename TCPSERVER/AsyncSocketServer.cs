@@ -242,9 +242,9 @@ namespace TcpServer.AsyncSocketServer
         /// <param name="data"></param>
         public void HandleSend(Socket client, byte[] data)
         {
-            if (!IsRunning) throw new InvalidProgramException("This TCP Scoket server has not been started.");
-            if (client == null) throw new ArgumentNullException("client");
-            if (data == null) throw new ArgumentNullException("data");
+            if (!IsRunning) throw new InvalidProgramException("服务端尚未启动！");
+            if (client == null) throw new ArgumentNullException("客户端client为空！");
+            if (data == null) throw new ArgumentNullException("客户端数据data为空！");
             client.BeginSend(data, 0, data.Length, SocketFlags.None, null, null);
         }
 

@@ -77,13 +77,13 @@ namespace TCPSERVER
                 {
                     ClientslistBox.Items.Add(s.RemoteEndPoint.ToString());
                 }
-                LogtextBox.Text = LogtextBox.Text + $"\r\n{ DateTime.Now.ToString() + "Clients:" + e.Socket.RemoteEndPoint.ToString()}已连接";
+                LogtextBox.Text = LogtextBox.Text + $"{ DateTime.Now.ToString() + "Clients:" + e.Socket.RemoteEndPoint.ToString()}已连接\r\n";
             }));
         }
 
         private void TcpServerStar(object sender, TcpServerStartEventArgs e)
         {
-            Invoke(new Action(() => { LogtextBox.Text = LogtextBox.Text + $"\r\n{ DateTime.Now.ToString() + "Server:" + e.Socket.LocalEndPoint.ToString()}已启动"; }));
+            Invoke(new Action(() => { LogtextBox.Text = LogtextBox.Text + $"{ DateTime.Now.ToString() + "Server:" + e.Socket.LocalEndPoint.ToString()}已启动\r\n"; }));
         }
 
         private void ClientDisconnected(object sender, TcpServerClientDisconnectedEventArgs e)
@@ -95,13 +95,13 @@ namespace TCPSERVER
                 {
                     ClientslistBox.Items.Add(s.RemoteEndPoint.ToString());
                 }
-                LogtextBox.Text = LogtextBox.Text + $"\r\n{ DateTime.Now.ToString() + "Clients:" + e.Socket.RemoteEndPoint.ToString()}已断开";
+                LogtextBox.Text = LogtextBox.Text + $"{ DateTime.Now.ToString() + "Clients:" + e.Socket.RemoteEndPoint.ToString()}已断开\r\n";
             }));
         }
 
         private void ReceiveData(object sender, TcpServerReceiveDatadEventArgs e)
         {
-            Invoke(new Action(() => { ReceivetextBox.Text = ReceivetextBox.Text + $"\r\n{ e.Socket.RemoteEndPoint.ToString() + "->收到:" + Encoding.ASCII.GetString(e.Data)}"; }));
+            Invoke(new Action(() => { ReceivetextBox.Text = ReceivetextBox.Text + $"{ e.Socket.RemoteEndPoint.ToString() + "->收到:" + Encoding.ASCII.GetString(e.Data)}\r\n"; }));
         }
     }
 }
