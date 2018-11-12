@@ -70,7 +70,15 @@ namespace TCPSERVER
 
         private void ClientConnected(object sender, TcpServerClientConnectedEventArgs e)
         {
-            Invoke(new Action(() => { LogtextBox.Text = LogtextBox.Text + $"\r\n{ DateTime.Now.ToString() + "Clients:" + e.Socket.RemoteEndPoint.ToString()}已连接"; }));
+            Invoke(new Action(() =>
+            {
+                ClientslistBox.Items.Clear();
+                foreach (Socket s in server._clientsList)
+                {
+                    ClientslistBox.Items.Add(s.LocalEndPoint.ToString());
+                }
+                LogtextBox.Text = LogtextBox.Text + $"\r\n{ DateTime.Now.ToString() + "Clients:" + e.Socket.RemoteEndPoint.ToString()}已连接";
+            }));
         }
 
         private void TcpServerStar(object sender, TcpServerStartEventArgs e)
@@ -80,7 +88,15 @@ namespace TCPSERVER
 
         private void ClientDisconnected(object sender, TcpServerClientDisconnectedEventArgs e)
         {
-            Invoke(new Action(() => { LogtextBox.Text = LogtextBox.Text + $"\r\n{ DateTime.Now.ToString() + "Clients:" + e.Socket.RemoteEndPoint.ToString()}已断开"; }));
+            Invoke(new Action(() =>
+            {
+                ClientslistBox.Items.Clear();
+                foreach (Socket s in server._clientsList)
+                {
+                    ClientslistBox.Items.Add(s.LocalEndPoint.ToString());
+                }
+                LogtextBox.Text = LogtextBox.Text + $"\r\n{ DateTime.Now.ToString() + "Clients:" + e.Socket.RemoteEndPoint.ToString()}已断开";
+            }));
         }
 
         private void ReceiveData(object sender, TcpServerReceiveDatadEventArgs e)

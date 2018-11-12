@@ -34,7 +34,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.PorttextBox = new System.Windows.Forms.TextBox();
-            this.IPlistBox = new System.Windows.Forms.ListBox();
+            this.ClientslistBox = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.SendtextBox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -100,14 +100,14 @@
             this.PorttextBox.Text = "11000";
             this.PorttextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
-            // IPlistBox
+            // ClientslistBox
             // 
-            this.IPlistBox.FormattingEnabled = true;
-            this.IPlistBox.ItemHeight = 12;
-            this.IPlistBox.Location = new System.Drawing.Point(4, 53);
-            this.IPlistBox.Name = "IPlistBox";
-            this.IPlistBox.Size = new System.Drawing.Size(120, 280);
-            this.IPlistBox.TabIndex = 6;
+            this.ClientslistBox.FormattingEnabled = true;
+            this.ClientslistBox.ItemHeight = 12;
+            this.ClientslistBox.Location = new System.Drawing.Point(4, 53);
+            this.ClientslistBox.Name = "ClientslistBox";
+            this.ClientslistBox.Size = new System.Drawing.Size(120, 280);
+            this.ClientslistBox.TabIndex = 6;
             // 
             // label3
             // 
@@ -182,7 +182,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.SendtextBox);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.IPlistBox);
+            this.Controls.Add(this.ClientslistBox);
             this.Controls.Add(this.PorttextBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -204,7 +204,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox PorttextBox;
-        private System.Windows.Forms.ListBox IPlistBox;
+        private System.Windows.Forms.ListBox ClientslistBox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox SendtextBox;
         private System.Windows.Forms.Label label4;
