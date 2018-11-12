@@ -15,7 +15,6 @@ namespace TCPSERVER
 {
     public partial class Form1 : Form
     {
-
         private AsyncSocketServer server;
 
         public Form1()
