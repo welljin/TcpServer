@@ -118,7 +118,7 @@ namespace TCPSERVER
 
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void Button3_Click(object sender, EventArgs e)
         {
             if (server._clientsList.Count > 0)
             {
